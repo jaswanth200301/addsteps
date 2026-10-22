@@ -86,7 +86,7 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}
 
     <section class="card stack">
       <button id="daily" class="alt hide">🎁 Claim daily bonus</button>
-      <button id="viewAd">📺 View an ad</button>
+      <button id="viewAd">📺 View an ad → get 1 ad view</button>
       <button id="redeem" class="alt">Redeem 1 ad view → 10 steps</button>
       <button id="step">🚶 Take a step <small>(hold to keep walking)</small></button>
       <p class="sub" id="streak" style="text-align:center"></p>
@@ -109,7 +109,8 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}
     </section>
   </div>
 
-  <p class="note">The ad is a sample. Real ads need an ad network.</p>
+  <p class="note" id="adNote">The ad is a sample. Real ads need an ad network.</p>
+  <p class="note"><a id="privLink" class="hide" href="#">Privacy policy</a></p>
 </main>
 
 <div id="ad" role="dialog" aria-modal="true" aria-label="Sample ad">
@@ -127,6 +128,11 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}
   /* ===== CONFIG: paste from Supabase → Project Settings → API ===== */
   var SB_URL="YOUR_SUPABASE_URL";          // e.g. https://abcd1234.supabase.co
   var SB_KEY="YOUR_SUPABASE_ANON_KEY";     // the public "anon" key (safe in the browser)
+  /* ===== ADS: Google AdSense "H5 Games Ads" (rewarded ads) =====
+     Leave AD_CLIENT empty to use the built-in sample ads. */
+  var AD_CLIENT="";        // your AdSense ID, e.g. "ca-pub-1234567890123456"
+  var AD_TEST=true;        // true = Google test ads. Set false when going live.
+  var PRIVACY_URL="";      // e.g. "/privacy.html" (shows a link in the footer)
   /* ================================================================ */
 
   var $=function(id){return document.getElementById(id)};
@@ -290,20 +296,48 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}
 
   var adTimer=null,elapsed=0,last=0;
   function closeAd(){clearInterval(adTimer);adTimer=null;$("ad").classList.remove("on")}
-  $("viewAd").onclick=function(){
+  function showSample(){
     var a=ADS[Math.floor(Math.random()*ADS.length)];
     $("adEm").textContent=a.e;$("adTitle").textContent=a.t;$("adTag").textContent=a.g;
     $("adBar").style.width="0";$("claim").disabled=true;
     elapsed=0;last=Date.now();$("ad").classList.add("on");clearInterval(adTimer);
     adTimer=setInterval(function(){var now=Date.now();if(!document.hidden)elapsed+=now-last;last=now;
       $("adBar").style.width=Math.min(100,elapsed/AD_MS*100)+"%";
-      if(elapsed>=AD_MS){clearInterval(adTimer);adTimer=null;$("claim").disabled=false}},50)};
+      if(elapsed>=AD_MS){clearInterval(adTimer);adTimer=null;$("claim").disabled=false}},50)}
+
+  /* real rewarded ads (Google Ad Placement API) */
+  var adBreak=function(){},adConfig=function(){},realOn=false,busy=false;
+  function loadAds(){
+    if(!AD_CLIENT)return;
+    window.adsbygoogle=window.adsbygoogle||[];
+    adBreak=adConfig=function(o){window.adsbygoogle.push(o)};
+    var sc=document.createElement("script");sc.async=true;sc.crossOrigin="anonymous";
+    sc.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+encodeURIComponent(AD_CLIENT);
+    sc.setAttribute("data-ad-client",AD_CLIENT);
+    if(AD_TEST)sc.setAttribute("data-adbreak-test","on");
+    sc.onerror=function(){realOn=false};
+    document.head.appendChild(sc);
+    adConfig({preloadAdBreaks:"on",sound:"on"});
+    realOn=true;
+    $("adNote").textContent="Ads help keep this game free. If no ad is available, a sample ad is shown.";
+  }
+  function realAd(){
+    if(busy)return;busy=true;var rewarded=false,handled=false;
+    adBreak({type:"reward",name:"redeem-ad",
+      beforeReward:function(show){show()}, // tapping the button is the player's opt-in
+      adViewed:function(){handled=true;rewarded=true;st.ads++;beep(740,.1);buzz(15);change();toast("📺 +1 ad view")},
+      adDismissed:function(){handled=true;toast("Ad skipped: no reward")},
+      adBreakDone:function(){busy=false;if(!handled&&!rewarded)showSample()}});
+  }
+  $("viewAd").onclick=function(){realOn?realAd():showSample()};
   $("adClose").onclick=closeAd;
   $("claim").onclick=function(){if(elapsed<AD_MS)return;closeAd();st.ads++;beep(740,.1);buzz(15);change()};
 
   function net(){$("off").classList.toggle("hide",navigator.onLine!==false)}
   addEventListener("online",function(){net();flush()});addEventListener("offline",net);net();
 
+  if(PRIVACY_URL){var pl=$("privLink");pl.href=PRIVACY_URL;pl.classList.remove("hide")}
+  loadAds();
   load();$("nameIn").value=st.name||"";
   if(st.name)enter();else render();
 })();
