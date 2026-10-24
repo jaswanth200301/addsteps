@@ -3,343 +3,882 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ad Steps</title>
+<title>Ad Steps - Walk & Climb the Leaderboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f3f5f9;--card:#fff;--text:#1b2230;--mute:#667085;--line:#e4e8ef;--accent:#4f6df5;--accent-t:#fff;--hi:#e8edff;--ok:#1f9d63;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1c212b;--text:#eef1f6;--mute:#9aa4b5;--line:#2a313d;--accent:#7b93ff;--accent-t:#0e1220;--hi:#28325a;--ok:#4cd08f}}
-:root[data-theme="dark"]{--bg:#12151c;--card:#1c212b;--text:#eef1f6;--mute:#9aa4b5;--line:#2a313d;--accent:#7b93ff;--accent-t:#0e1220;--hi:#28325a;--ok:#4cd08f}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:480px;margin:0 auto;padding:16px;display:grid;gap:14px}
-.top,.row{display:flex;gap:8px}.top{align-items:center;justify-content:space-between}
-h1{margin:4px 0 0;font-size:26px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.sub{color:var(--mute);font-size:14px;margin:0}
-button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:14px 16px;min-height:48px;background:var(--accent);color:var(--accent-t);width:100%;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
-button:disabled{opacity:.4;cursor:not-allowed}
-button.alt{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
-button.ic{width:auto;min-width:44px;padding:8px 12px;background:var(--card);color:var(--text);border:1px solid var(--line)}
-button.tab{padding:8px;min-height:40px;background:transparent;color:var(--mute);border:1px solid var(--line)}
-button.tab.on{background:var(--hi);color:var(--text);border-color:var(--accent)}
-input{font:inherit;width:100%;padding:13px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--text);margin:10px 0}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
-.stats b{display:block;font-size:26px}.stats span{font-size:12px;color:var(--mute)}
-.stack{display:grid;gap:10px}
-.rules{margin:14px 0 0;padding:12px 12px 12px 30px;border-radius:12px;background:var(--bg);font-size:13px;color:var(--mute)}
-.rules li{display:list-item;padding:3px 0}.rules b{color:var(--text)}
-.track{position:relative;height:60px;margin:6px 0 2px}
-.track::after{content:"";position:absolute;left:0;right:0;bottom:8px;height:6px;border-radius:3px;background:var(--line)}
-.scene{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around;opacity:.45;font-size:22px}
-.hiker{position:absolute;bottom:12px;font-size:32px;transition:left .2s;transform:translateX(-50%)}
-.flag{position:absolute;right:0;bottom:12px;font-size:24px}
-ol{list-style:none;margin:10px 0 0;padding:0}
-li{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:10px}
-li.me{background:var(--hi);font-weight:700}
-li .n{width:28px;color:var(--mute)}li .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.note{font-size:12px;color:var(--mute);text-align:center}
-#ad{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
-#ad.on{display:flex}
-#ad .tag{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:2px 8px}
-#ad .em{font-size:96px}#ad h2{margin:0;font-size:28px}
-.bar{width:100%;max-width:360px;height:10px;border-radius:5px;background:var(--line);overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--ok)}
-#ad .x{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:12px;width:auto;background:transparent;color:var(--mute)}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center}
-#toast.on{opacity:1}
-#off{background:#b54708;color:#fff;text-align:center;font-size:13px;padding:6px}
-details summary{cursor:pointer;font-weight:600;min-height:32px}
-.msg{color:#d92d20;font-size:13px;min-height:18px;margin:0}
-.hide{display:none!important}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  :root {
+    --bg-base: #f8fafc;
+    --card-base: #ffffff;
+    --text-primary: #0f172a;
+    --text-muted: #64748b;
+    --border-base: #e2e8f0;
+  }
+  .dark {
+    --bg-base: #0b0f19;
+    --card-base: #131b2e;
+    --text-primary: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border-base: #1e293b;
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .no-select {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .hiker-motion {
+    transition: left 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pulse-subtle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  .pulse-btn {
+    animation: pulse-subtle 2s infinite ease-in-out;
+  }
 </style>
 </head>
-<body>
-<div id="off" class="hide" role="status">You’re offline. Progress is saved on this device and will sync later.</div>
-<main>
-  <div class="top"><h1>👣 Ad Steps</h1>
-    <div class="row"><button class="ic" id="mute" aria-label="Toggle sound">🔊</button><button class="ic" id="theme" aria-label="Toggle light or dark mode">🌓</button></div>
-  </div>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white transition-colors duration-200">
 
-  <section class="card" id="join">
-    <b>Enter your name to start</b>
-    <input id="nameIn" maxlength="16" placeholder="Your name" autocomplete="nickname" aria-label="Your name">
-    <p class="msg" id="joinMsg"></p>
-    <button id="startBtn">Start walking</button>
-    <ol class="rules" aria-label="Game conditions">
-      <li><b>This is just a game.</b></li>
-      <li>A reward awaits you if you stay on the top of the leaderboard. What it is stays a surprise.</li>
-      <li>This is not a gambling site. We don’t offer money as prizes, we don’t promote explicit content, and we don’t make false promises.</li>
-    </ol>
+<!-- Offline Banner -->
+<div id="offlineNotice" class="hidden bg-amber-500 text-slate-950 text-xs font-bold py-1.5 px-4 text-center tracking-wide z-50">
+  ⚡ You're currently offline. Your steps are safely saved locally and will sync once reconnected.
+</div>
+
+<main class="w-full max-w-md mx-auto p-4 sm:p-5 flex flex-col gap-4">
+  
+  <!-- Header Bar -->
+  <header class="flex items-center justify-between pt-1 pb-1">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl drop-shadow-sm">👣</span>
+      <div>
+        <h1 class="font-extrabold text-xl tracking-tight leading-tight">Ad Steps</h1>
+        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Play & Climb</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button id="muteBtn" class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-lg shadow-sm hover:scale-105 active:scale-95 transition-all" aria-label="Toggle Sound">🔊</button>
+      <button id="themeBtn" class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center text-lg shadow-sm hover:scale-105 active:scale-95 transition-all" aria-label="Toggle Dark Mode">🌓</button>
+    </div>
+  </header>
+
+  <!-- Section: Onboarding / Name Input -->
+  <section id="onboardingCard" class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col gap-4">
+    <div>
+      <h2 class="text-lg font-bold">Pick your hiker tag</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">This name will represent you on the global leaderboard.</p>
+    </div>
+    <div>
+      <input id="playerNameInput" type="text" maxlength="16" placeholder="e.g. TrailBlazer" autocomplete="nickname"
+        class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold text-base focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors">
+      <p id="onboardingErr" class="text-xs text-rose-500 font-semibold mt-1.5 min-h-[16px]"></p>
+    </div>
+    <button id="startJourneyBtn" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold shadow-md shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+      <span>Hit the Trail</span>
+      <span class="text-lg">➔</span>
+    </button>
+    <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400 flex flex-col gap-1.5">
+      <div class="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-200">
+        <span>🛡️</span> Fair Play & Sportsmanship
+      </div>
+      <p>Watch short video samples to collect steps, climb laps, and compete against other walkers in real time.</p>
+    </div>
   </section>
 
-  <div id="game" class="hide" style="display:grid;gap:14px">
-    <section class="card">
-      <div class="stats">
-        <div><b id="cAds">0</b><span>Ad views</span></div>
-        <div><b id="cSteps">0</b><span>Steps left</span></div>
-        <div><b id="cScore">0</b><span>Score</span></div>
+  <!-- Section: Main Game Interface (Hidden initially) -->
+  <div id="gameContainer" class="hidden flex flex-col gap-4">
+
+    <!-- Interactive Track Card -->
+    <section class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm flex flex-col gap-4">
+      <div class="grid grid-cols-3 gap-2 text-center pb-1">
+        <div class="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Ads Stored</span>
+          <b id="adsDisplay" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 leading-tight">0</b>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Steps Left</span>
+          <b id="stepsDisplay" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 leading-tight">0</b>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Total Score</span>
+          <b id="scoreDisplay" class="text-2xl font-black text-amber-500 leading-tight">0</b>
+        </div>
       </div>
-      <div class="track" aria-hidden="true"><div class="scene" id="scene"></div><span class="hiker">🚶</span><span class="flag">🏁</span></div>
-      <p class="sub" id="lap" style="text-align:right"></p>
+
+      <!-- Scenery & Walking Canvas Track -->
+      <div class="relative pt-6 pb-2 px-1">
+        <div id="sceneEmoji" class="absolute top-0 inset-x-0 flex justify-around text-xl opacity-60 pointer-events-none select-none">
+          🌲🌳🌲
+        </div>
+        <div class="relative h-10 flex items-center">
+          <div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/60 dark:border-slate-700/60">
+            <div id="lapProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-200" style="width: 0%"></div>
+          </div>
+          <span id="hikerSprite" class="hiker-motion absolute bottom-2 text-3xl select-none no-select -translate-x-1/2 drop-shadow" style="left: 4%;">🚶</span>
+          <span class="absolute right-0 bottom-2 text-2xl select-none no-select drop-shadow">🏁</span>
+        </div>
+        <div class="flex justify-between items-center text-xs font-semibold text-slate-400 mt-1">
+          <span id="lapCounter">Lap 1</span>
+          <span id="lapFraction">0 / 50</span>
+        </div>
+      </div>
     </section>
 
-    <section class="card stack">
-      <button id="daily" class="alt hide">🎁 Claim daily bonus</button>
-      <button id="viewAd">📺 View an ad → get 1 ad view</button>
-      <button id="redeem" class="alt">Redeem 1 ad view → 10 steps</button>
-      <button id="step">🚶 Take a step <small>(hold to keep walking)</small></button>
-      <p class="sub" id="streak" style="text-align:center"></p>
+    <!-- Action Controls -->
+    <section class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm flex flex-col gap-2.5">
+      
+      <!-- Daily Check-In Bonus -->
+      <button id="dailyBonusBtn" class="hidden w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl shadow-sm hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+        <span>🎁</span>
+        <span>Claim Daily Gift (+10 Steps)</span>
+      </button>
+
+      <!-- Watch Ad -->
+      <button id="viewAdBtn" class="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-extrabold rounded-2xl shadow-sm hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+        <span>📺</span>
+        <span>Watch Rewarded Ad <span class="font-normal text-xs opacity-75">(+1 Ad View)</span></span>
+      </button>
+
+      <!-- Convert / Redeem -->
+      <button id="redeemBtn" disabled class="w-full py-3 border-2 border-indigo-500/40 text-indigo-600 dark:text-indigo-400 font-bold rounded-2xl hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 text-sm">
+        <span>⚡</span>
+        <span>Redeem 1 Ad View ➔ 10 Steps</span>
+      </button>
+
+      <!-- Primary Walking Button -->
+      <button id="stepBtn" disabled class="no-select w-full py-4 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white disabled:text-slate-400 font-black rounded-2xl shadow-md shadow-emerald-600/20 disabled:shadow-none active:scale-[0.98] transition-all flex flex-col items-center justify-center">
+        <span class="text-lg flex items-center gap-2">
+          <span>🚶</span>
+          <span>Take a Step</span>
+        </span>
+        <span class="text-[11px] font-semibold opacity-80">(Tap repeatedly or press & hold)</span>
+      </button>
+
+      <div id="streakBanner" class="text-center text-xs font-bold text-amber-500 min-h-[16px]"></div>
     </section>
 
-    <section class="card">
-      <b>🏆 Top 10 worldwide</b>
-      <div class="row" style="margin-top:10px"><button class="tab on" id="tAll">All time</button><button class="tab" id="tWeek">This week</button></div>
-      <p class="sub" id="lbStatus" style="margin-top:8px">Loading scoreboard…</p>
-      <ol id="lb"></ol>
-      <p class="sub" id="rank" style="margin-top:8px"></p>
+    <!-- Global Leaderboard -->
+    <section class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5 font-extrabold text-base">
+          <span>🏆</span>
+          <span>Global Leaderboard</span>
+        </div>
+        <div class="flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold">
+          <button id="tabAll" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs">All Time</button>
+          <button id="tabWeek" class="px-2.5 py-1 rounded-lg text-slate-500 dark:text-slate-400">Weekly</button>
+        </div>
+      </div>
+
+      <p id="lbStatus" class="text-[11px] font-medium text-slate-400">Connecting to cloud rankings...</p>
+
+      <ol id="leaderboardList" class="flex flex-col gap-1.5"></ol>
+
+      <div id="userRankBadge" class="text-center text-xs font-bold text-indigo-600 dark:text-indigo-400 pt-1"></div>
     </section>
 
-    <section class="card">
-      <details><summary>Settings</summary>
-        <input id="renameIn" maxlength="16" aria-label="Change name">
-        <p class="msg" id="renMsg"></p>
-        <div class="stack"><button class="alt" id="rename">Change name</button><button class="alt" id="reset">Reset my progress</button></div>
+    <!-- Settings (Cleaned - No DB keys) -->
+    <section class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+      <details class="group">
+        <summary class="font-bold text-sm cursor-pointer list-none flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span class="flex items-center gap-2">⚙️ Profile Settings</span>
+          <span class="transition-transform group-open:rotate-180 text-xs">▼</span>
+        </summary>
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Rename Hiker</label>
+            <div class="flex gap-2">
+              <input id="renameInput" type="text" maxlength="16" placeholder="New name"
+                class="flex-1 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold focus:outline-none focus:border-indigo-500">
+              <button id="saveRenameBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-500 active:scale-95 transition-all">Save</button>
+            </div>
+            <p id="renameMsg" class="text-[11px] text-rose-500 font-semibold mt-1 min-h-[14px]"></p>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+            <div>
+              <span class="block text-xs font-bold text-slate-600 dark:text-slate-300">Reset Progress</span>
+              <span class="text-[11px] text-slate-400">Clear all local and remote score data</span>
+            </div>
+            <button id="resetProgressBtn" class="px-3 py-2 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl text-xs font-bold hover:bg-rose-100 active:scale-95 transition-all">
+              Reset
+            </button>
+          </div>
+        </div>
       </details>
     </section>
+
   </div>
 
-  <p class="note" id="adNote">The ad is a sample. Real ads need an ad network.</p>
-  <p class="note"><a id="privLink" class="hide" href="#">Privacy policy</a></p>
+  <footer class="text-center text-xs text-slate-400 pt-2 pb-6 flex flex-col gap-1">
+    <p>Ad Steps · Built for fair casual competition</p>
+    <p class="text-[11px] opacity-70">Rewarded ads simulate real network delivery.</p>
+  </footer>
+
 </main>
 
-<div id="ad" role="dialog" aria-modal="true" aria-label="Sample ad">
-  <span class="tag">Sample ad</span>
-  <button class="x" id="adClose" aria-label="Close ad">✕</button>
-  <div class="em" id="adEm"></div><h2 id="adTitle"></h2><p class="sub" id="adTag"></p>
-  <div class="bar"><i id="adBar"></i></div>
-  <button id="claim" disabled style="max-width:360px">Claim 1 ad view</button>
+<!-- Rewarded Ad Modal Simulator -->
+<div id="adModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" role="dialog" aria-modal="true">
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full p-6 relative flex flex-col items-center text-center shadow-2xl">
+    <span class="absolute top-4 left-4 text-[10px] font-black uppercase tracking-wider text-slate-400 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-0.5">Rewarded Ad</span>
+    <button id="closeAdModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg text-sm" aria-label="Dismiss Ad">✕</button>
+
+    <div id="adIcon" class="text-7xl my-4 select-none">🍕</div>
+    <h3 id="adHeadline" class="text-xl font-extrabold text-slate-900 dark:text-white">Artisan Woodfired Pizza</h3>
+    <p id="adSubtext" class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[240px]">Fresh ingredients, handcrafted dough, baked in under 90 seconds.</p>
+
+    <!-- Progress Timer Bar -->
+    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 my-6 overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
+      <div id="adProgressBar" class="bg-emerald-500 h-full w-0 transition-all"></div>
+    </div>
+
+    <button id="claimAdRewardBtn" disabled class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white disabled:text-slate-400 font-extrabold rounded-2xl shadow-sm disabled:cursor-not-allowed transition-all text-sm">
+      Claim Reward (5s)
+    </button>
+  </div>
 </div>
-<div id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<!-- Toast Feedback Notification -->
+<div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 px-5 py-2.5 rounded-full font-bold text-xs tracking-wide shadow-xl z-50 pointer-events-none opacity-0 transition-opacity duration-200 max-w-[90%] text-center"></div>
+
 <script>
-(function(){
-  /* ===== CONFIG: paste from Supabase → Project Settings → API ===== */
-  var SB_URL="YOUR_SUPABASE_URL";          // e.g. https://abcd1234.supabase.co
-  var SB_KEY="YOUR_SUPABASE_ANON_KEY";     // the public "anon" key (safe in the browser)
-  /* ===== ADS: Google AdSense "H5 Games Ads" (rewarded ads) =====
-     Leave AD_CLIENT empty to use the built-in sample ads. */
-  var AD_CLIENT="";        // your AdSense ID, e.g. "ca-pub-1234567890123456"
-  var AD_TEST=true;        // true = Google test ads. Set false when going live.
-  var PRIVACY_URL="";      // e.g. "/privacy.html" (shows a link in the footer)
-  /* ================================================================ */
+(function() {
+  /* ==========================================================================
+     HARDCODED SECRETS CONFIGURATION
+     Replace placeholders with your real credentials from:
+     Supabase Dashboard -> Project Settings -> API
+     ========================================================================== */
+  const SB_CONFIG = {
+    URL: "https://kkuhestrfjsqyvxfqljj.supabase.co",      // <-- Paste your Supabase Project URL here
+    ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrdWhlc3RyZmpzcXl2eGZxbGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MDkxNDAsImV4cCI6MjEwODM4NTE0MH0.xpAz-4kg1AdiiPypDzEDk1HU3LL590xuZOVWwkSTWKY" // <-- Paste your Supabase Public Anon Key here
+  };
 
-  var $=function(id){return document.getElementById(id)};
-  var KEY="adsteps.v2",TKEY="adsteps.theme",LAP=50,AD_MS=5000,COOL=90;
-  var MILES=[10,25,50,100,250,500,1000,2500,5000];
-  var SCENES=["🌲🌳🌲","🏜️🌵🏜️","❄️⛄❄️","🌊🏝️🌊","🌋🔥🌋"];
-  var ADS=[{e:"🍕",t:"Slice of Heaven Pizza",g:"Hot, fast, and always cheesy."},
-    {e:"🚲",t:"Zoom Bikes",g:"Pedal further. Worry less."},
-    {e:"☕",t:"Daily Grind Coffee",g:"Wake up to something better."}];
-  var BAD=/fuck|shit|bitch|cunt|nigg|fag|rape|nazi|dick|cock|pussy|slut|whore|hitler/;
-  function mkWeek(){var d=new Date(),k=(d.getUTCDay()+6)%7;return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-k)).toISOString().slice(0,10)}
-  var WK=mkWeek();
-  function fresh(n){return {name:n||"",ads:0,steps:0,score:0,ws:0,wk:WK,day:"",streak:0,mute:false}}
-  var st=fresh(),sb=null,myId=null,tab="all",lastStep=0;
-  var synced=0,wsynced=0,lastSync=Date.now(),saveT=null,boardT=null,flushing=false;
+  /* AdSense H5 Placement (Optional) */
+  const GOOGLE_H5_CLIENT = ""; // e.g. "ca-pub-XXXXXXXXXXXXXXXX"
+  const GOOGLE_H5_TEST = true;
 
-  function sig(o){var s="as2|"+[o.name,o.ads,o.steps,o.score,o.ws,o.wk,o.day,o.streak].join("|"),h=5381;
-    for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return h}
-  function load(){try{var s=JSON.parse(localStorage.getItem(KEY));
-    if(s&&s.h===sig(s)){st=Object.assign(fresh(),s)}else if(s&&s.name){st=fresh(s.name)}}catch(e){}
-    if(st.wk!==WK){st.wk=WK;st.ws=0}}
-  function persist(){st.h=sig(st);try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+  /* Game Constants */
+  const LAP_LENGTH = 50;
+  const AD_DURATION_MS = 5000;
+  const STEP_COOLDOWN_MS = 80;
+  const LOCAL_STORAGE_KEY = "adsteps.profile.v3";
+  const THEME_KEY = "adsteps.theme";
 
-  function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t)}
-  try{applyTheme(localStorage.getItem(TKEY))}catch(e){}
-  $("theme").onclick=function(){
-    var cur=document.documentElement.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
-    var n=cur==="dark"?"light":"dark";applyTheme(n);try{localStorage.setItem(TKEY,n)}catch(e){}};
+  const SCENERY = ["🌲🌳🌲", "🏜️🌵🏜️", "❄️⛄❄️", "🌊🏝️🌊", "🌋🔥🌋", "🏔️🦅🏔️"];
+  const SAMPLE_ADS = [
+    { icon: "🍕", title: "Slice of Heaven Pizza", desc: "Crispy crust, melted mozzarella, baked fresh daily." },
+    { icon: "🚲", title: "AeroPulse Electric Bikes", desc: "Glide through the city with zero effort and maximum style." },
+    { icon: "☕", title: "Obsidian Roast Coffee", desc: "Single-origin beans roasted to dark chocolate perfection." },
+    { icon: "🎧", title: "WaveSound ANC Pro", desc: "Crystal clear acoustic isolation wherever life takes you." }
+  ];
+  const PROFANITY_FILTER = /fuck|shit|bitch|cunt|nigg|fag|rape|nazi|dick|cock|pussy|slut|whore|hitler/i;
 
-  var ac=null,toastT=null;
-  function beep(f,d){if(st.mute)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
-    var o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(ac.destination);
-    o.start();o.stop(ac.currentTime+d)}catch(e){}}
-  function buzz(p){try{if(!st.mute&&navigator.vibrate)navigator.vibrate(p)}catch(e){}}
-  function toast(t){var el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(function(){el.classList.remove("on")},2200)}
-  $("mute").onclick=function(){st.mute=!st.mute;persist();render()};
+  const $ = (id) => document.getElementById(id);
 
-  function today(){return new Date().toISOString().slice(0,10)}
-  function render(){
-    $("cAds").textContent=st.ads;$("cSteps").textContent=st.steps;$("cScore").textContent=st.score;
-    $("redeem").disabled=st.ads<1;$("step").disabled=st.steps<1;
-    $("step").setAttribute("aria-label","Take a step. "+st.steps+" steps left");
-    var into=st.score%LAP,lap=Math.floor(st.score/LAP);
-    document.querySelector(".hiker").style.left=(4+(into/LAP)*88)+"%";
-    $("scene").textContent=SCENES[lap%SCENES.length];
-    $("lap").textContent="Lap "+(lap+1)+" · "+into+"/"+LAP;
-    $("daily").classList.toggle("hide",st.day===today());
-    $("streak").textContent=st.streak>1?"🔥 "+st.streak+"-day streak":"";
-    $("mute").textContent=st.mute?"🔇":"🔊";
+  function getWeekStartISO() {
+    const now = new Date();
+    const day = (now.getUTCDay() + 6) % 7;
+    const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - day));
+    return monday.toISOString().slice(0, 10);
   }
-  function change(){persist();render();queueSave()}
+  const CURRENT_WEEK = getWeekStartISO();
 
-  /* ---------- Supabase ---------- */
-  function queueSave(){if(!sb||!myId)return;clearTimeout(saveT);saveT=setTimeout(flush,1200)}
-  async function flush(){
-    saveT=null;if(!sb||!myId||flushing)return;
-    if(synced>=st.score&&wsynced>=st.ws&&st.name===flush.n)return;
-    flushing=true;
-    // send at most what the server's anti-cheat allows; catch up in further rounds
-    var cap=40+Math.floor(5*Math.min(3600,(Date.now()-lastSync)/1000));
-    var s=Math.min(st.score,synced+cap),w=Math.min(st.ws,wsynced+cap,s);
-    var r=await sb.from("players").upsert({id:myId,name:st.name,score:s,week_start:WK,week_score:w});
-    flushing=false;
-    if(r.error){saveT=setTimeout(flush,8000);return}
-    synced=s;wsynced=w;lastSync=Date.now();flush.n=st.name;
-    if(synced<st.score||wsynced<st.ws)saveT=setTimeout(flush,2000);
-    getRank();
-  }
-  document.addEventListener("visibilitychange",function(){if(document.hidden&&saveT){clearTimeout(saveT);flush()}});
-  async function getRank(){
-    if(!sb||st.score<1)return;
-    var r=await sb.from("players").select("id",{count:"exact",head:true}).gt("score",st.score);
-    if(!r.error)$("rank").textContent="Your rank: #"+(r.count>=100?"100+":r.count+1);
-  }
-  function draw(rows,mine){
-    var ol=$("lb");ol.textContent="";var found=false;
-    rows.forEach(function(r,i){
-      var li=document.createElement("li");if(r.id===myId){li.className="me";found=true}
-      var n=document.createElement("span");n.className="n";n.textContent=i+1;
-      var nm=document.createElement("span");nm.className="nm";nm.textContent=(r.name||"Anonymous")+(r.id===myId?" (you)":"");
-      var sc=document.createElement("span");sc.textContent=r.score;
-      li.append(n,nm,sc);ol.appendChild(li)});
-    if(!found&&mine>0){var l2=document.createElement("li");l2.className="me";
-      var a=document.createElement("span");a.className="n";a.textContent="…";
-      var b=document.createElement("span");b.className="nm";b.textContent=st.name+" (you)";
-      var c=document.createElement("span");c.textContent=mine;l2.append(a,b,c);ol.appendChild(l2)}
-    $("lbStatus").textContent=rows.length?"Updates live for everyone.":"No scores yet. Be the first!";
-  }
-  async function loadBoard(){
-    if(!sb)return;var all=tab==="all";
-    var q=sb.from("players").select(all?"id,name,score":"id,name,score:week_score");
-    if(!all)q=q.eq("week_start",WK).gt("week_score",0);
-    var r=await q.order(all?"score":"week_score",{ascending:false}).limit(10);
-    if(r.error){$("lbStatus").textContent="Scoreboard unavailable right now.";return}
-    draw(r.data,all?st.score:st.ws);
-  }
-  function soonBoard(){if(boardT)return;boardT=setTimeout(function(){boardT=null;loadBoard()},1500)}
-  function setTab(t){tab=t;$("tAll").classList.toggle("on",t==="all");$("tWeek").classList.toggle("on",t==="week");loadBoard()}
-  $("tAll").onclick=function(){setTab("all")};$("tWeek").onclick=function(){setTab("week")};
+  /* Local Profile State */
+  let state = {
+    name: "",
+    ads: 0,
+    steps: 0,
+    score: 0,
+    weeklyScore: 0,
+    weekStart: CURRENT_WEEK,
+    lastDailyDate: "",
+    streak: 0,
+    muted: false
+  };
 
-  async function connect(){
-    if(!window.supabase||SB_URL.indexOf("YOUR_")===0){$("lbStatus").textContent="Global scoreboard not set up yet. Your progress is saved on this device.";return}
-    try{
-      sb=supabase.createClient(SB_URL,SB_KEY);
-      var s=(await sb.auth.getSession()).data.session;
-      if(!s){var a=await sb.auth.signInAnonymously();if(a.error)throw a.error;s=a.data.session}
-      myId=s.user.id;
-      var m=await sb.from("players").select("score,week_start,week_score").eq("id",myId).maybeSingle();
-      if(m.data){synced=m.data.score;lastSync=Date.now();
-        if(m.data.week_start===WK){wsynced=m.data.week_score;if(wsynced>st.ws)st.ws=wsynced}
-        if(synced>st.score){st.score=synced;persist();render();toast("Welcome back! Score restored.")}}
-      flush.n=m.data?st.name:null;
-      if(st.score>0)flush();
-      loadBoard();getRank();
-      sb.channel("lb").on("postgres_changes",{event:"*",schema:"public",table:"players"},soonBoard).subscribe();
-      setInterval(loadBoard,30000);
-    }catch(e){sb=null;$("lbStatus").textContent="Global scoreboard unavailable right now. Your progress is saved on this device."}
+  let supabaseClient = null;
+  let authUserId = null;
+  let activeTab = "all";
+  let lastStepTimestamp = 0;
+  let saveTimer = null;
+  let isFlushing = false;
+  let lastSyncedScore = 0;
+  let lastSyncedWeekly = 0;
+
+  /* ---------------- Sound Synthesizer ---------------- */
+  let audioCtx = null;
+  function playTone(freq, duration, type = "sine") {
+    if (state.muted) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
   }
 
-  function okName(v){
-    if(!v)return "Please enter a name.";
-    if(BAD.test(v.toLowerCase().replace(/[^a-z]/g,"")))return "Please choose a different name.";
-    return "";
+  function vibrate(ms) {
+    if (!state.muted && navigator.vibrate) {
+      try { navigator.vibrate(ms); } catch(e) {}
+    }
   }
-  function enter(){$("join").classList.add("hide");$("game").classList.remove("hide");$("renameIn").value=st.name;render();connect()}
-  $("startBtn").onclick=function(){
-    var v=$("nameIn").value.trim().slice(0,16),e=okName(v);$("joinMsg").textContent=e;if(e)return;
-    st.name=v;persist();enter()};
-  $("nameIn").addEventListener("keydown",function(e){if(e.key==="Enter")$("startBtn").click()});
-  $("rename").onclick=function(){
-    var v=$("renameIn").value.trim().slice(0,16),e=okName(v);$("renMsg").textContent=e;if(e)return;
-    st.name=v;change();flush();toast("Name updated")};
-  var rs=false;
-  $("reset").onclick=function(){
-    if(!rs){rs=true;$("reset").textContent="Tap again to erase everything";setTimeout(function(){rs=false;$("reset").textContent="Reset my progress"},4000);return}
-    var n=st.name;st=fresh(n);persist();render();rs=false;$("reset").textContent="Reset my progress";
-    if(sb&&myId){sb.from("players").delete().eq("id",myId).then(function(){});synced=wsynced=0;flush.n=null}
-    $("rank").textContent="";toast("Progress reset")};
 
-  $("redeem").onclick=function(){if(st.ads<1)return;st.ads--;st.steps+=10;beep(660,.08);change()};
-  $("daily").onclick=function(){
-    var y=new Date(Date.now()-864e5).toISOString().slice(0,10);
-    st.streak=st.day===y?st.streak+1:1;st.day=today();
-    var b=5+Math.min(st.streak,7);st.steps+=b;beep(880,.12);buzz([20,40,20]);toast("🎁 +"+b+" steps!");change()};
-  function doStep(){
-    var now=Date.now();if(st.steps<1||now-lastStep<COOL)return false;
-    lastStep=now;st.steps--;st.score++;
-    if(st.wk!==WK){st.wk=WK;st.ws=0}st.ws++;
-    beep(300+(st.score%LAP)*6,.04);buzz(8);
-    if(st.score%LAP===0){toast("🏁 Lap "+(st.score/LAP)+" complete!");buzz([30,50,30])}
-    else if(MILES.indexOf(st.score)>-1){toast("🎉 "+st.score+" steps!");buzz([30,50,30])}
-    change();return true}
-  var holdT=null,holdI=null;
-  function stopHold(){clearTimeout(holdT);clearInterval(holdI);holdT=holdI=null}
-  var sbn=$("step");
-  sbn.addEventListener("pointerdown",function(e){if(e.button>0)return;doStep();stopHold();
-    holdT=setTimeout(function(){holdI=setInterval(function(){if(!doStep())stopHold()},140)},400)});
-  ["pointerup","pointerleave","pointercancel"].forEach(function(t){sbn.addEventListener(t,stopHold)});
-  sbn.addEventListener("click",function(e){if(e.detail===0)doStep()});
-  sbn.addEventListener("contextmenu",function(e){e.preventDefault()});
-
-  var adTimer=null,elapsed=0,last=0;
-  function closeAd(){clearInterval(adTimer);adTimer=null;$("ad").classList.remove("on")}
-  function showSample(){
-    var a=ADS[Math.floor(Math.random()*ADS.length)];
-    $("adEm").textContent=a.e;$("adTitle").textContent=a.t;$("adTag").textContent=a.g;
-    $("adBar").style.width="0";$("claim").disabled=true;
-    elapsed=0;last=Date.now();$("ad").classList.add("on");clearInterval(adTimer);
-    adTimer=setInterval(function(){var now=Date.now();if(!document.hidden)elapsed+=now-last;last=now;
-      $("adBar").style.width=Math.min(100,elapsed/AD_MS*100)+"%";
-      if(elapsed>=AD_MS){clearInterval(adTimer);adTimer=null;$("claim").disabled=false}},50)}
-
-  /* real rewarded ads (Google Ad Placement API) */
-  var adBreak=function(){},adConfig=function(){},realOn=false,busy=false;
-  function loadAds(){
-    if(!AD_CLIENT)return;
-    window.adsbygoogle=window.adsbygoogle||[];
-    adBreak=adConfig=function(o){window.adsbygoogle.push(o)};
-    var sc=document.createElement("script");sc.async=true;sc.crossOrigin="anonymous";
-    sc.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+encodeURIComponent(AD_CLIENT);
-    sc.setAttribute("data-ad-client",AD_CLIENT);
-    if(AD_TEST)sc.setAttribute("data-adbreak-test","on");
-    sc.onerror=function(){realOn=false};
-    document.head.appendChild(sc);
-    adConfig({preloadAdBreaks:"on",sound:"on"});
-    realOn=true;
-    $("adNote").textContent="Ads help keep this game free. If no ad is available, a sample ad is shown.";
+  /* ---------------- Toast & Feedback ---------------- */
+  let toastTimer = null;
+  function showToast(msg) {
+    const el = $("toastNotification");
+    el.textContent = msg;
+    el.classList.remove("opacity-0");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.add("opacity-0"), 2200);
   }
-  function realAd(){
-    if(busy)return;busy=true;var rewarded=false,handled=false;
-    adBreak({type:"reward",name:"redeem-ad",
-      beforeReward:function(show){show()}, // tapping the button is the player's opt-in
-      adViewed:function(){handled=true;rewarded=true;st.ads++;beep(740,.1);buzz(15);change();toast("📺 +1 ad view")},
-      adDismissed:function(){handled=true;toast("Ad skipped: no reward")},
-      adBreakDone:function(){busy=false;if(!handled&&!rewarded)showSample()}});
+
+  /* ---------------- State Persistence ---------------- */
+  function saveLocal() {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+    } catch(e) {}
   }
-  $("viewAd").onclick=function(){realOn?realAd():showSample()};
-  $("adClose").onclick=closeAd;
-  $("claim").onclick=function(){if(elapsed<AD_MS)return;closeAd();st.ads++;beep(740,.1);buzz(15);change()};
 
-  function net(){$("off").classList.toggle("hide",navigator.onLine!==false)}
-  addEventListener("online",function(){net();flush()});addEventListener("offline",net);net();
+  function loadLocal() {
+    try {
+      const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+      if (data && typeof data === "object") {
+        state = Object.assign(state, data);
+      }
+    } catch(e) {}
+    if (state.weekStart !== CURRENT_WEEK) {
+      state.weekStart = CURRENT_WEEK;
+      state.weeklyScore = 0;
+    }
+  }
 
-  if(PRIVACY_URL){var pl=$("privLink");pl.href=PRIVACY_URL;pl.classList.remove("hide")}
-  loadAds();
-  load();$("nameIn").value=st.name||"";
-  if(st.name)enter();else render();
+  /* ---------------- UI Render ---------------- */
+  function renderUI() {
+    $("adsDisplay").textContent = state.ads;
+    $("stepsDisplay").textContent = state.steps;
+    $("scoreDisplay").textContent = state.score;
+
+    $("redeemBtn").disabled = state.ads < 1;
+    $("stepBtn").disabled = state.steps < 1;
+
+    const lapIndex = Math.floor(state.score / LAP_LENGTH);
+    const scoreInLap = state.score % LAP_LENGTH;
+    const progressPercent = (scoreInLap / LAP_LENGTH) * 100;
+
+    $("lapProgressBar").style.width = progressPercent + "%";
+    $("hikerSprite").style.left = (4 + (progressPercent * 0.88)) + "%";
+    $("sceneEmoji").textContent = SCENERY[lapIndex % SCENERY.length];
+    $("lapCounter").textContent = "Lap " + (lapIndex + 1);
+    $("lapFraction").textContent = scoreInLap + " / " + LAP_LENGTH;
+
+    const todayISO = new Date().toISOString().slice(0, 10);
+    $("dailyBonusBtn").classList.toggle("hidden", state.lastDailyDate === todayISO);
+    $("streakBanner").textContent = state.streak > 1 ? `🔥 ${state.streak}-day streak!` : "";
+
+    $("muteBtn").textContent = state.muted ? "🔇" : "🔊";
+  }
+
+  function updateAndSync() {
+    saveLocal();
+    renderUI();
+    queueCloudSync();
+  }
+
+  /* ---------------- Cloud Sync (Supabase) ---------------- */
+  function queueCloudSync() {
+    if (!supabaseClient || !authUserId) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(flushCloudSync, 1200);
+  }
+
+  async function flushCloudSync() {
+    saveTimer = null;
+    if (!supabaseClient || !authUserId || isFlushing) return;
+    if (lastSyncedScore >= state.score && lastSyncedWeekly >= state.weeklyScore) return;
+
+    isFlushing = true;
+    try {
+      const { error } = await supabaseClient.from("players").upsert({
+        id: authUserId,
+        name: state.name,
+        score: state.score,
+        week_score: state.weeklyScore,
+        week_start: CURRENT_WEEK,
+        updated_at: new Date().toISOString()
+      });
+
+      if (!error) {
+        lastSyncedScore = state.score;
+        lastSyncedWeekly = state.weeklyScore;
+        fetchRank();
+      }
+    } catch(e) {
+      console.warn("Cloud sync deferred:", e);
+    } finally {
+      isFlushing = false;
+    }
+  }
+
+  async function fetchRank() {
+    if (!supabaseClient || state.score <= 0) return;
+    try {
+      const { count, error } = await supabaseClient
+        .from("players")
+        .select("id", { count: "exact", head: true })
+        .gt("score", state.score);
+
+      if (!error && count !== null) {
+        $("userRankBadge").textContent = `Your Worldwide Standing: #${count + 1}`;
+      }
+    } catch(e) {}
+  }
+
+  async function fetchLeaderboard() {
+    if (!supabaseClient) {
+      displayMockLeaderboard();
+      return;
+    }
+
+    const isAll = activeTab === "all";
+    $("lbStatus").textContent = "Refreshing scores...";
+
+    try {
+      let query = supabaseClient.from("players").select(isAll ? "id,name,score" : "id,name,score:week_score");
+      if (!isAll) {
+        query = query.eq("week_start", CURRENT_WEEK).gt("week_score", 0);
+      }
+      const { data, error } = await query.order(isAll ? "score" : "week_score", { ascending: false }).limit(10);
+
+      if (error) throw error;
+      renderLeaderboard(data || []);
+      $("lbStatus").textContent = "Live global scoreboard active";
+    } catch(e) {
+      console.warn("Leaderboard fetch fallback:", e);
+      displayMockLeaderboard();
+    }
+  }
+
+  function displayMockLeaderboard() {
+    const mockData = [
+      { id: "mock-1", name: "AlpineAce", score: 840 },
+      { id: "mock-2", name: "SummitSeeker", score: 620 },
+      { id: "mock-3", name: "TrailBlazer", score: 410 },
+      { id: "mock-4", name: "TerraWalker", score: 250 }
+    ];
+    renderLeaderboard(mockData);
+    $("lbStatus").textContent = "Offline sample rankings shown";
+  }
+
+  function renderLeaderboard(records) {
+    const list = $("leaderboardList");
+    list.innerHTML = "";
+    let foundSelf = false;
+
+    records.forEach((row, idx) => {
+      const isMe = (row.id === authUserId);
+      if (isMe) foundSelf = true;
+
+      const item = document.createElement("li");
+      item.className = `flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold ${
+        isMe 
+          ? "bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100 font-bold" 
+          : "bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+      }`;
+
+      const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `${idx + 1}.`;
+      item.innerHTML = `
+        <div class="flex items-center gap-2 overflow-hidden">
+          <span class="w-5 text-center text-slate-400 font-bold">${medal}</span>
+          <span class="truncate">${escapeHtml(row.name || "Anonymous")}${isMe ? " (You)" : ""}</span>
+        </div>
+        <span class="font-extrabold text-slate-900 dark:text-white tabular-nums">${row.score}</span>
+      `;
+      list.appendChild(item);
+    });
+
+    if (!foundSelf && state.score > 0) {
+      const selfItem = document.createElement("li");
+      selfItem.className = "flex items-center justify-between p-2.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-950 dark:text-indigo-100";
+      selfItem.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="w-5 text-center text-slate-400 font-bold">...</span>
+          <span class="truncate">${escapeHtml(state.name)} (You)</span>
+        </div>
+        <span class="font-extrabold tabular-nums">${activeTab === "all" ? state.score : state.weeklyScore}</span>
+      `;
+      list.appendChild(selfItem);
+    }
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag] || tag));
+  }
+
+  async function initSupabase() {
+    if (!window.supabase || !SB_CONFIG.URL || SB_CONFIG.URL.includes("xyzcompany")) {
+      displayMockLeaderboard();
+      return;
+    }
+
+    try {
+      supabaseClient = window.supabase.createClient(SB_CONFIG.URL, SB_CONFIG.ANON_KEY);
+      let session = (await supabaseClient.auth.getSession()).data.session;
+      if (!session) {
+        const authRes = await supabaseClient.auth.signInAnonymously();
+        if (authRes.error) throw authRes.error;
+        session = authRes.data.session;
+      }
+
+      authUserId = session.user.id;
+
+      // Restore existing remote score if superior
+      const { data } = await supabaseClient
+        .from("players")
+        .select("score,week_start,week_score")
+        .eq("id", authUserId)
+        .maybeSingle();
+
+      if (data) {
+        lastSyncedScore = data.score;
+        if (data.week_start === CURRENT_WEEK) {
+          lastSyncedWeekly = data.week_score;
+          if (data.week_score > state.weeklyScore) state.weeklyScore = data.week_score;
+        }
+        if (data.score > state.score) {
+          state.score = data.score;
+          updateAndSync();
+          showToast("Cloud score restored!");
+        }
+      }
+
+      fetchLeaderboard();
+      fetchRank();
+
+      // Realtime subscription for live leaderboard updates
+      supabaseClient
+        .channel("public:players")
+        .on("postgres_changes", { event: "*", schema: "public", table: "players" }, () => {
+          fetchLeaderboard();
+        })
+        .subscribe();
+
+    } catch(e) {
+      console.warn("Supabase init bypassed:", e);
+      displayMockLeaderboard();
+    }
+  }
+
+  /* ---------------- Game Mechanics ---------------- */
+  function takeStep() {
+    const now = Date.now();
+    if (state.steps < 1 || now - lastStepTimestamp < STEP_COOLDOWN_MS) return false;
+
+    lastStepTimestamp = now;
+    state.steps--;
+    state.score++;
+
+    if (state.weekStart !== CURRENT_WEEK) {
+      state.weekStart = CURRENT_WEEK;
+      state.weeklyScore = 0;
+    }
+    state.weeklyScore++;
+
+    playTone(280 + (state.score % LAP_LENGTH) * 8, 0.05);
+    vibrate(6);
+
+    // Lap Completion Celebration
+    if (state.score % LAP_LENGTH === 0) {
+      showToast(`🏁 Lap ${state.score / LAP_LENGTH} Conquered!`);
+      playTone(660, 0.15, "triangle");
+      vibrate([40, 60, 40]);
+      if (window.confetti) {
+        confetti({ particleCount: 45, spread: 60, origin: { y: 0.8 } });
+      }
+    }
+
+    updateAndSync();
+    return true;
+  }
+
+  /* Hold to Walk */
+  let holdTimeout = null;
+  let holdInterval = null;
+  function startHoldWalk() {
+    takeStep();
+    clearHoldWalk();
+    holdTimeout = setTimeout(() => {
+      holdInterval = setInterval(() => {
+        if (!takeStep()) clearHoldWalk();
+      }, 130);
+    }, 380);
+  }
+  function clearHoldWalk() {
+    clearTimeout(holdTimeout);
+    clearInterval(holdInterval);
+    holdTimeout = holdInterval = null;
+  }
+
+  /* ---------------- Rewarded Ad System ---------------- */
+  let adTimerInterval = null;
+  let adElapsedMs = 0;
+  let adStartTimestamp = 0;
+
+  function launchAdExperience() {
+    const ad = SAMPLE_ADS[Math.floor(Math.random() * SAMPLE_ADS.length)];
+    $("adIcon").textContent = ad.icon;
+    $("adHeadline").textContent = ad.title;
+    $("adSubtext").textContent = ad.desc;
+
+    adElapsedMs = 0;
+    $("adProgressBar").style.width = "0%";
+    $("claimAdRewardBtn").disabled = true;
+    $("claimAdRewardBtn").textContent = "Watch for 5s";
+
+    $("adModal").classList.remove("hidden");
+    $("adModal").classList.add("flex");
+
+    adStartTimestamp = Date.now();
+    clearInterval(adTimerInterval);
+    adTimerInterval = setInterval(() => {
+      if (!document.hidden) {
+        adElapsedMs = Date.now() - adStartTimestamp;
+      }
+      const progress = Math.min(100, (adElapsedMs / AD_DURATION_MS) * 100);
+      $("adProgressBar").style.width = progress + "%";
+
+      const remainingSec = Math.max(0, Math.ceil((AD_DURATION_MS - adElapsedMs) / 1000));
+      if (remainingSec > 0) {
+        $("claimAdRewardBtn").textContent = `Reward unlocks in ${remainingSec}s`;
+      } else {
+        clearInterval(adTimerInterval);
+        $("claimAdRewardBtn").disabled = false;
+        $("claimAdRewardBtn").textContent = "Claim +1 Ad View 🎉";
+        $("claimAdRewardBtn").classList.add("pulse-btn");
+      }
+    }, 60);
+  }
+
+  function dismissAdModal() {
+    clearInterval(adTimerInterval);
+    $("claimAdRewardBtn").classList.remove("pulse-btn");
+    $("adModal").classList.add("hidden");
+    $("adModal").classList.remove("flex");
+  }
+
+  /* ---------------- Input & Validation ---------------- */
+  function validatePlayerName(val) {
+    if (!val || !val.trim()) return "Please enter a hiker name.";
+    const clean = val.trim();
+    if (clean.length < 2) return "Name must be at least 2 characters.";
+    if (PROFANITY_FILTER.test(clean.toLowerCase().replace(/[^a-z]/g, ""))) {
+      return "Please choose a friendly name.";
+    }
+    return null;
+  }
+
+  function enterMainGame() {
+    $("onboardingCard").classList.add("hidden");
+    $("gameContainer").classList.remove("hidden");
+    $("renameInput").value = state.name;
+    renderUI();
+    initSupabase();
+  }
+
+  /* ---------------- Event Listeners ---------------- */
+  $("startJourneyBtn").addEventListener("click", () => {
+    const inputVal = $("playerNameInput").value;
+    const err = validatePlayerName(inputVal);
+    $("onboardingErr").textContent = err || "";
+    if (err) return;
+
+    state.name = inputVal.trim().slice(0, 16);
+    saveLocal();
+    enterMainGame();
+  });
+
+  $("playerNameInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") $("startJourneyBtn").click();
+  });
+
+  // Walking Controls
+  const stepBtn = $("stepBtn");
+  stepBtn.addEventListener("pointerdown", (e) => {
+    if (e.button === 0) startHoldWalk();
+  });
+  ["pointerup", "pointerleave", "pointercancel"].forEach(evt => {
+    stepBtn.addEventListener(evt, clearHoldWalk);
+  });
+  stepBtn.addEventListener("contextmenu", (e) => e.preventDefault());
+
+  // Conversion: Ads -> Steps
+  $("redeemBtn").addEventListener("click", () => {
+    if (state.ads < 1) return;
+    state.ads--;
+    state.steps += 10;
+    playTone(520, 0.08);
+    showToast("⚡ +10 Steps Added!");
+    updateAndSync();
+  });
+
+  // Daily Streak Reward
+  $("dailyBonusBtn").addEventListener("click", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+
+    state.streak = (state.lastDailyDate === yesterday) ? state.streak + 1 : 1;
+    state.lastDailyDate = today;
+    const bonus = 10 + Math.min(state.streak * 2, 20);
+    state.steps += bonus;
+
+    playTone(780, 0.15, "triangle");
+    vibrate([20, 40, 20]);
+    showToast(`🎁 Daily Gift: +${bonus} Steps!`);
+    updateAndSync();
+  });
+
+  // Watch Ad
+  $("viewAdBtn").addEventListener("click", launchAdExperience);
+  $("closeAdModalBtn").addEventListener("click", dismissAdModal);
+
+  $("claimAdRewardBtn").addEventListener("click", () => {
+    if (adElapsedMs < AD_DURATION_MS) return;
+    dismissAdModal();
+    state.ads++;
+    playTone(600, 0.1);
+    vibrate(15);
+    showToast("📺 +1 Ad View Stored!");
+    updateAndSync();
+  });
+
+  // Leaderboard Tabs
+  $("tabAll").addEventListener("click", () => {
+    activeTab = "all";
+    $("tabAll").className = "px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs";
+    $("tabWeek").className = "px-2.5 py-1 rounded-lg text-slate-500 dark:text-slate-400";
+    fetchLeaderboard();
+  });
+
+  $("tabWeek").addEventListener("click", () => {
+    activeTab = "week";
+    $("tabWeek").className = "px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs";
+    $("tabAll").className = "px-2.5 py-1 rounded-lg text-slate-500 dark:text-slate-400";
+    fetchLeaderboard();
+  });
+
+  // Profile Settings: Rename
+  $("saveRenameBtn").addEventListener("click", () => {
+    const val = $("renameInput").value;
+    const err = validatePlayerName(val);
+    $("renameMsg").textContent = err || "";
+    if (err) return;
+
+    state.name = val.trim().slice(0, 16);
+    updateAndSync();
+    showToast("Name successfully updated!");
+  });
+
+  // Profile Settings: Reset
+  let resetPending = false;
+  $("resetProgressBtn").addEventListener("click", () => {
+    if (!resetPending) {
+      resetPending = true;
+      $("resetProgressBtn").textContent = "Confirm Reset?";
+      setTimeout(() => {
+        resetPending = false;
+        $("resetProgressBtn").textContent = "Reset";
+      }, 3500);
+      return;
+    }
+
+    const savedName = state.name;
+    state = {
+      name: savedName,
+      ads: 0,
+      steps: 0,
+      score: 0,
+      weeklyScore: 0,
+      weekStart: CURRENT_WEEK,
+      lastDailyDate: "",
+      streak: 0,
+      muted: state.muted
+    };
+    saveLocal();
+    renderUI();
+    if (supabaseClient && authUserId) {
+      supabaseClient.from("players").delete().eq("id", authUserId).then(() => {});
+      lastSyncedScore = lastSyncedWeekly = 0;
+    }
+    showToast("Progress has been reset.");
+    resetPending = false;
+    $("resetProgressBtn").textContent = "Reset";
+  });
+
+  // Sound Toggle
+  $("muteBtn").addEventListener("click", () => {
+    state.muted = !state.muted;
+    saveLocal();
+    renderUI();
+  });
+
+  // Dark/Light Theme Toggle
+  function applyTheme(theme) {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }
+  const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(savedTheme);
+
+  $("themeBtn").addEventListener("click", () => {
+    const isDark = document.documentElement.classList.contains("dark");
+    const nextTheme = isDark ? "light" : "dark";
+    applyTheme(nextTheme);
+    localStorage.setItem(THEME_KEY, nextTheme);
+  });
+
+  // Network State
+  window.addEventListener("online", () => {
+    $("offlineNotice").classList.add("hidden");
+    flushCloudSync();
+  });
+  window.addEventListener("offline", () => {
+    $("offlineNotice").classList.remove("hidden");
+  });
+  if (!navigator.onLine) $("offlineNotice").classList.remove("hidden");
+
+  // Lifecycle Sync on tab minimize
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && saveTimer) flushCloudSync();
+  });
+
+  /* ---------------- Bootstrapping ---------------- */
+  loadLocal();
+  if (state.name) {
+    enterMainGame();
+  } else {
+    renderUI();
+  }
 })();
 </script>
 </body>
