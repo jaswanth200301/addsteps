@@ -4,8 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ad Steps - Walk & Climb the Leaderboard</title>
+<!-- CrazyGames SDK v3 -->
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+<!-- Tailwind CSS & Confetti -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +66,7 @@
       <span class="text-2xl drop-shadow-sm">👣</span>
       <div>
         <h1 class="font-extrabold text-xl tracking-tight leading-tight">Ad Steps</h1>
-        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Play & Climb</p>
+        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">CrazyGames Edition</p>
       </div>
     </div>
     <div class="flex items-center gap-1.5">
@@ -88,13 +92,13 @@
     </button>
     <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400 flex flex-col gap-1.5">
       <div class="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-200">
-        <span>🛡️</span> Fair Play & Sportsmanship
+        <span>🎮</span> Powered by CrazyGames
       </div>
-      <p>Watch short video samples to collect steps, climb laps, and compete against other walkers in real time.</p>
+      <p>Watch rewarded video ads to stock up on steps, complete laps, and compete against others globally.</p>
     </div>
   </section>
 
-  <!-- Section: Main Game Interface (Hidden initially) -->
+  <!-- Section: Main Game Interface -->
   <div id="gameContainer" class="hidden flex flex-col gap-4">
 
     <!-- Interactive Track Card -->
@@ -114,7 +118,7 @@
         </div>
       </div>
 
-      <!-- Scenery & Walking Canvas Track -->
+      <!-- Scenery & Track Canvas -->
       <div class="relative pt-6 pb-2 px-1">
         <div id="sceneEmoji" class="absolute top-0 inset-x-0 flex justify-around text-xl opacity-60 pointer-events-none select-none">
           🌲🌳🌲
@@ -133,7 +137,7 @@
       </div>
     </section>
 
-    <!-- Action Controls -->
+    <!-- Controls -->
     <section class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm flex flex-col gap-2.5">
       
       <!-- Daily Check-In Bonus -->
@@ -142,10 +146,10 @@
         <span>Claim Daily Gift (+10 Steps)</span>
       </button>
 
-      <!-- Watch Ad -->
+      <!-- CrazyGames Rewarded Video -->
       <button id="viewAdBtn" class="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-extrabold rounded-2xl shadow-sm hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
         <span>📺</span>
-        <span>Watch Rewarded Ad <span class="font-normal text-xs opacity-75">(+1 Ad View)</span></span>
+        <span>Watch Video Ad <span class="font-normal text-xs opacity-75">(+1 Ad View)</span></span>
       </button>
 
       <!-- Convert / Redeem -->
@@ -154,7 +158,7 @@
         <span>Redeem 1 Ad View ➔ 10 Steps</span>
       </button>
 
-      <!-- Primary Walking Button -->
+      <!-- Primary Step Button -->
       <button id="stepBtn" disabled class="no-select w-full py-4 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white disabled:text-slate-400 font-black rounded-2xl shadow-md shadow-emerald-600/20 disabled:shadow-none active:scale-[0.98] transition-all flex flex-col items-center justify-center">
         <span class="text-lg flex items-center gap-2">
           <span>🚶</span>
@@ -186,7 +190,7 @@
       <div id="userRankBadge" class="text-center text-xs font-bold text-indigo-600 dark:text-indigo-400 pt-1"></div>
     </section>
 
-    <!-- Settings (Cleaned - No DB keys) -->
+    <!-- Profile Settings -->
     <section class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
       <details class="group">
         <summary class="font-bold text-sm cursor-pointer list-none flex items-center justify-between text-slate-700 dark:text-slate-300">
@@ -221,22 +225,21 @@
 
   <footer class="text-center text-xs text-slate-400 pt-2 pb-6 flex flex-col gap-1">
     <p>Ad Steps · Built for fair casual competition</p>
-    <p class="text-[11px] opacity-70">Rewarded ads simulate real network delivery.</p>
+    <p class="text-[11px] opacity-70">Integrated with CrazyGames SDK v3</p>
   </footer>
 
 </main>
 
-<!-- Rewarded Ad Modal Simulator -->
+<!-- Fallback Ad Modal (Shown only when testing outside CrazyGames) -->
 <div id="adModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" role="dialog" aria-modal="true">
   <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full p-6 relative flex flex-col items-center text-center shadow-2xl">
-    <span class="absolute top-4 left-4 text-[10px] font-black uppercase tracking-wider text-slate-400 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-0.5">Rewarded Ad</span>
+    <span class="absolute top-4 left-4 text-[10px] font-black uppercase tracking-wider text-slate-400 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-0.5">Test Simulator</span>
     <button id="closeAdModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg text-sm" aria-label="Dismiss Ad">✕</button>
 
-    <div id="adIcon" class="text-7xl my-4 select-none">🍕</div>
-    <h3 id="adHeadline" class="text-xl font-extrabold text-slate-900 dark:text-white">Artisan Woodfired Pizza</h3>
-    <p id="adSubtext" class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[240px]">Fresh ingredients, handcrafted dough, baked in under 90 seconds.</p>
+    <div class="text-7xl my-4 select-none">🎮</div>
+    <h3 class="text-xl font-extrabold text-slate-900 dark:text-white">CrazyGames Ad Simulator</h3>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[240px]">Real ads display when running inside the CrazyGames portal or local test server.</p>
 
-    <!-- Progress Timer Bar -->
     <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 my-6 overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
       <div id="adProgressBar" class="bg-emerald-500 h-full w-0 transition-all"></div>
     </div>
@@ -247,39 +250,28 @@
   </div>
 </div>
 
-<!-- Toast Feedback Notification -->
+<!-- Toast Notification -->
 <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 px-5 py-2.5 rounded-full font-bold text-xs tracking-wide shadow-xl z-50 pointer-events-none opacity-0 transition-opacity duration-200 max-w-[90%] text-center"></div>
 
 <script>
 (function() {
   /* ==========================================================================
-     HARDCODED SECRETS CONFIGURATION
-     Replace placeholders with your real credentials from:
-     Supabase Dashboard -> Project Settings -> API
+     SUPABASE CONFIGURATION
+     Replace placeholders with your real credentials:
+     Dashboard -> Project Settings -> API
      ========================================================================== */
   const SB_CONFIG = {
-    URL: "https://kkuhestrfjsqyvxfqljj.supabase.co",      // <-- Paste your Supabase Project URL here
-    ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrdWhlc3RyZmpzcXl2eGZxbGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MDkxNDAsImV4cCI6MjEwODM4NTE0MH0.xpAz-4kg1AdiiPypDzEDk1HU3LL590xuZOVWwkSTWKY" // <-- Paste your Supabase Public Anon Key here
+    URL: "https://kkuhestrfjsqyvxfqljj.supabase.co",      // <-- Your Supabase Project URL
+    ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrdWhlc3RyZmpzcXl2eGZxbGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MDkxNDAsImV4cCI6MjEwODM4NTE0MH0.xpAz-4kg1AdiiPypDzEDk1HU3LL590xuZOVWwkSTWKY" // <-- Your Supabase Public Anon Key
   };
-
-  /* AdSense H5 Placement (Optional) */
-  const GOOGLE_H5_CLIENT = ""; // e.g. "ca-pub-XXXXXXXXXXXXXXXX"
-  const GOOGLE_H5_TEST = true;
 
   /* Game Constants */
   const LAP_LENGTH = 50;
-  const AD_DURATION_MS = 5000;
   const STEP_COOLDOWN_MS = 80;
   const LOCAL_STORAGE_KEY = "adsteps.profile.v3";
   const THEME_KEY = "adsteps.theme";
 
   const SCENERY = ["🌲🌳🌲", "🏜️🌵🏜️", "❄️⛄❄️", "🌊🏝️🌊", "🌋🔥🌋", "🏔️🦅🏔️"];
-  const SAMPLE_ADS = [
-    { icon: "🍕", title: "Slice of Heaven Pizza", desc: "Crispy crust, melted mozzarella, baked fresh daily." },
-    { icon: "🚲", title: "AeroPulse Electric Bikes", desc: "Glide through the city with zero effort and maximum style." },
-    { icon: "☕", title: "Obsidian Roast Coffee", desc: "Single-origin beans roasted to dark chocolate perfection." },
-    { icon: "🎧", title: "WaveSound ANC Pro", desc: "Crystal clear acoustic isolation wherever life takes you." }
-  ];
   const PROFANITY_FILTER = /fuck|shit|bitch|cunt|nigg|fag|rape|nazi|dick|cock|pussy|slut|whore|hitler/i;
 
   const $ = (id) => document.getElementById(id);
@@ -313,6 +305,7 @@
   let isFlushing = false;
   let lastSyncedScore = 0;
   let lastSyncedWeekly = 0;
+  let crazySDK = null;
 
   /* ---------------- Sound Synthesizer ---------------- */
   let audioCtx = null;
@@ -339,7 +332,7 @@
     }
   }
 
-  /* ---------------- Toast & Feedback ---------------- */
+  /* ---------------- Toast Notification ---------------- */
   let toastTimer = null;
   function showToast(msg) {
     const el = $("toastNotification");
@@ -399,6 +392,89 @@
     saveLocal();
     renderUI();
     queueCloudSync();
+  }
+
+  /* ---------------- CrazyGames SDK v3 ---------------- */
+  async function initCrazyGames() {
+    try {
+      if (window.CrazyGames && window.CrazyGames.SDK) {
+        crazySDK = window.CrazyGames.SDK;
+        await crazySDK.init();
+        if (crazySDK.game) {
+          crazySDK.game.gameplayStart();
+        }
+      }
+    } catch(err) {
+      console.warn("CrazyGames SDK initialization skipped (running standalone):", err);
+    }
+  }
+
+  function launchRewardedAd() {
+    if (!crazySDK || !crazySDK.ad) {
+      launchFallbackSimulator();
+      return;
+    }
+
+    const callbacks = {
+      adStarted: () => {
+        state.muted = true; // Mute sound during video ad
+      },
+      adFinished: () => {
+        state.muted = false;
+        state.ads++;
+        playTone(600, 0.1);
+        vibrate(15);
+        showToast("📺 +1 Ad View Earned!");
+        updateAndSync();
+      },
+      adError: (error, errorData) => {
+        state.muted = false;
+        console.warn("CrazyGames ad error:", error, errorData);
+        showToast("No video ad available right now. Try again soon!");
+      }
+    };
+
+    crazySDK.ad.requestAd("rewarded", callbacks);
+  }
+
+  /* ---------------- Standalone Fallback Modal ---------------- */
+  let adTimerInterval = null;
+  let adElapsedMs = 0;
+  const SIMULATOR_DURATION = 5000;
+
+  function launchFallbackSimulator() {
+    adElapsedMs = 0;
+    $("adProgressBar").style.width = "0%";
+    $("claimAdRewardBtn").disabled = true;
+    $("claimAdRewardBtn").textContent = "Watch for 5s";
+
+    $("adModal").classList.remove("hidden");
+    $("adModal").classList.add("flex");
+
+    const start = Date.now();
+    clearInterval(adTimerInterval);
+    adTimerInterval = setInterval(() => {
+      adElapsedMs = Date.now() - start;
+      const progress = Math.min(100, (adElapsedMs / SIMULATOR_DURATION) * 100);
+      $("adProgressBar").style.width = progress + "%";
+
+      const remainingSec = Math.max(0, Math.ceil((SIMULATOR_DURATION - adElapsedMs) / 1000));
+      if (remainingSec > 0) {
+        $("claimAdRewardBtn").textContent = `Reward unlocks in ${remainingSec}s`;
+      } else {
+        clearInterval(adTimerInterval);
+        $("claimAdRewardBtn").disabled = false;
+        $("claimAdRewardBtn").textContent = "Claim +1 Ad View 🎉";
+        $("claimAdRewardBtn").classList.add("pulse-btn");
+      }
+    }, 60);
+  }
+
+  function dismissFallbackModal() {
+    clearInterval(adTimerInterval);
+    $("claimAdRewardBtn").classList.remove("pulse-btn");
+    $("adModal").classList.add("hidden");
+    $("adModal").classList.remove("flex");
   }
 
   /* ---------------- Cloud Sync (Supabase) ---------------- */
@@ -470,7 +546,6 @@
       renderLeaderboard(data || []);
       $("lbStatus").textContent = "Live global scoreboard active";
     } catch(e) {
-      console.warn("Leaderboard fetch fallback:", e);
       displayMockLeaderboard();
     }
   }
@@ -483,7 +558,7 @@
       { id: "mock-4", name: "TerraWalker", score: 250 }
     ];
     renderLeaderboard(mockData);
-    $("lbStatus").textContent = "Offline sample rankings shown";
+    $("lbStatus").textContent = "Sample rankings displayed";
   }
 
   function renderLeaderboard(records) {
@@ -554,7 +629,6 @@
 
       authUserId = session.user.id;
 
-      // Restore existing remote score if superior
       const { data } = await supabaseClient
         .from("players")
         .select("score,week_start,week_score")
@@ -577,7 +651,6 @@
       fetchLeaderboard();
       fetchRank();
 
-      // Realtime subscription for live leaderboard updates
       supabaseClient
         .channel("public:players")
         .on("postgres_changes", { event: "*", schema: "public", table: "players" }, () => {
@@ -586,12 +659,12 @@
         .subscribe();
 
     } catch(e) {
-      console.warn("Supabase init bypassed:", e);
+      console.warn("Supabase bypassed:", e);
       displayMockLeaderboard();
     }
   }
 
-  /* ---------------- Game Mechanics ---------------- */
+  /* ---------------- Gameplay Mechanics ---------------- */
   function takeStep() {
     const now = Date.now();
     if (state.steps < 1 || now - lastStepTimestamp < STEP_COOLDOWN_MS) return false;
@@ -609,7 +682,6 @@
     playTone(280 + (state.score % LAP_LENGTH) * 8, 0.05);
     vibrate(6);
 
-    // Lap Completion Celebration
     if (state.score % LAP_LENGTH === 0) {
       showToast(`🏁 Lap ${state.score / LAP_LENGTH} Conquered!`);
       playTone(660, 0.15, "triangle");
@@ -639,53 +711,6 @@
     clearTimeout(holdTimeout);
     clearInterval(holdInterval);
     holdTimeout = holdInterval = null;
-  }
-
-  /* ---------------- Rewarded Ad System ---------------- */
-  let adTimerInterval = null;
-  let adElapsedMs = 0;
-  let adStartTimestamp = 0;
-
-  function launchAdExperience() {
-    const ad = SAMPLE_ADS[Math.floor(Math.random() * SAMPLE_ADS.length)];
-    $("adIcon").textContent = ad.icon;
-    $("adHeadline").textContent = ad.title;
-    $("adSubtext").textContent = ad.desc;
-
-    adElapsedMs = 0;
-    $("adProgressBar").style.width = "0%";
-    $("claimAdRewardBtn").disabled = true;
-    $("claimAdRewardBtn").textContent = "Watch for 5s";
-
-    $("adModal").classList.remove("hidden");
-    $("adModal").classList.add("flex");
-
-    adStartTimestamp = Date.now();
-    clearInterval(adTimerInterval);
-    adTimerInterval = setInterval(() => {
-      if (!document.hidden) {
-        adElapsedMs = Date.now() - adStartTimestamp;
-      }
-      const progress = Math.min(100, (adElapsedMs / AD_DURATION_MS) * 100);
-      $("adProgressBar").style.width = progress + "%";
-
-      const remainingSec = Math.max(0, Math.ceil((AD_DURATION_MS - adElapsedMs) / 1000));
-      if (remainingSec > 0) {
-        $("claimAdRewardBtn").textContent = `Reward unlocks in ${remainingSec}s`;
-      } else {
-        clearInterval(adTimerInterval);
-        $("claimAdRewardBtn").disabled = false;
-        $("claimAdRewardBtn").textContent = "Claim +1 Ad View 🎉";
-        $("claimAdRewardBtn").classList.add("pulse-btn");
-      }
-    }, 60);
-  }
-
-  function dismissAdModal() {
-    clearInterval(adTimerInterval);
-    $("claimAdRewardBtn").classList.remove("pulse-btn");
-    $("adModal").classList.add("hidden");
-    $("adModal").classList.remove("flex");
   }
 
   /* ---------------- Input & Validation ---------------- */
@@ -723,7 +748,6 @@
     if (e.key === "Enter") $("startJourneyBtn").click();
   });
 
-  // Walking Controls
   const stepBtn = $("stepBtn");
   stepBtn.addEventListener("pointerdown", (e) => {
     if (e.button === 0) startHoldWalk();
@@ -733,7 +757,6 @@
   });
   stepBtn.addEventListener("contextmenu", (e) => e.preventDefault());
 
-  // Conversion: Ads -> Steps
   $("redeemBtn").addEventListener("click", () => {
     if (state.ads < 1) return;
     state.ads--;
@@ -743,7 +766,6 @@
     updateAndSync();
   });
 
-  // Daily Streak Reward
   $("dailyBonusBtn").addEventListener("click", () => {
     const today = new Date().toISOString().slice(0, 10);
     const yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
@@ -759,13 +781,14 @@
     updateAndSync();
   });
 
-  // Watch Ad
-  $("viewAdBtn").addEventListener("click", launchAdExperience);
-  $("closeAdModalBtn").addEventListener("click", dismissAdModal);
+  // CrazyGames Rewarded Video Trigger
+  $("viewAdBtn").addEventListener("click", launchRewardedAd);
 
+  // Fallback simulator controls
+  $("closeAdModalBtn").addEventListener("click", dismissFallbackModal);
   $("claimAdRewardBtn").addEventListener("click", () => {
-    if (adElapsedMs < AD_DURATION_MS) return;
-    dismissAdModal();
+    if (adElapsedMs < SIMULATOR_DURATION) return;
+    dismissFallbackModal();
     state.ads++;
     playTone(600, 0.1);
     vibrate(15);
@@ -843,7 +866,7 @@
     renderUI();
   });
 
-  // Dark/Light Theme Toggle
+  // Theme Toggle
   function applyTheme(theme) {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }
@@ -867,13 +890,13 @@
   });
   if (!navigator.onLine) $("offlineNotice").classList.remove("hidden");
 
-  // Lifecycle Sync on tab minimize
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && saveTimer) flushCloudSync();
   });
 
   /* ---------------- Bootstrapping ---------------- */
   loadLocal();
+  initCrazyGames();
   if (state.name) {
     enterMainGame();
   } else {
